@@ -31,6 +31,15 @@ func CreateUser(user *models.User) error {
 	return nil
 }
 
+func FindUser(email string) (*models.User, error) {
+	var user models.User
+	result := database.DB.Where("email = ?", email).First(&user)
+	if result.Error != nil {
+		return nil, fmt.Errorf("error finding user: %w", result.Error)
+	}
+	return &user, nil
+}
+
 func DeleteUser(id uuid.UUID) error {
 	result := database.DB.Delete(&models.User{}, "id = ?", id)
 	if result.Error != nil {

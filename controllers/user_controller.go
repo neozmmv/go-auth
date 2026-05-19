@@ -6,12 +6,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/neozmmv/go-auth/models"
+	"github.com/neozmmv/go-auth/services"
 	"github.com/neozmmv/go-auth/utils"
 )
-
-func GetUsers(c *gin.Context) {
-	c.JSON(200, Users)
-}
 
 func CreateUser(c *gin.Context) {
 	errors := []string{}
@@ -33,7 +30,11 @@ func CreateUser(c *gin.Context) {
 		c.JSON(400, gin.H{"errors": errors})
 		return
 	}
-	Users = append(Users, newUser)
+	err := services.CreateUser(&newUser)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to create user"})
+		return
+	}
 	c.JSON(201, newUser)
 }
 
@@ -56,15 +57,13 @@ func Login(c *gin.Context) {
 		return
 	}
 	// logic to find user and validate
-
-	var foundUser *models.User
-	for _, u := range Users {
-		if u.Email == user.Email && u.Password == user.Password {
-			foundUser = &u
-			break
-		}
+	foundUser, err := services.FindUser(user.Email)
+	if err != nil {
+		c.JSON(401, gin.H{"error": "Invalid email or password"})
+		return
 	}
-	if foundUser == nil {
+
+	if !utils.ComparePassword(foundUser.Password, user.Password) {
 		c.JSON(401, gin.H{"error": "Invalid email or password"})
 		return
 	}
@@ -75,6 +74,34 @@ func Login(c *gin.Context) {
 		return
 	}
 	c.JSON(200, gin.H{"token": token})
+}
+
+func SignUp(c *gin.Context) {
+	errors := []string{}
+	var newUser models.User
+	if err := c.BindJSON(&newUser); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	if newUser.Name == "" {
+		errors = append(errors, "Name is required")
+	}
+	if newUser.Email == "" {
+		errors = append(errors, "Email is required")
+	}
+	if newUser.Password == "" {
+		errors = append(errors, "Password is required")
+	}
+	if len(errors) > 0 {
+		c.JSON(400, gin.H{"errors": errors})
+		return
+	}
+	err := services.CreateUser(&newUser)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to create user"})
+		return
+	}
+	c.JSON(201, newUser)
 }
 
 func VerifyToken(c *gin.Context) {
