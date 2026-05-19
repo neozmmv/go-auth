@@ -16,11 +16,9 @@ func main() {
 	}
 	database.ConnectDatabase()
 	r := gin.Default()
-	//r.GET("/users", middleware.Auth, controllers.GetUsers)
-	r.POST("/users", middleware.Auth, controllers.CreateUser)
 	r.POST("/login", controllers.Login)
 	r.POST("/signup", controllers.SignUp)
-	r.POST("/verify", controllers.VerifyToken)
 	r.GET("/me", middleware.Auth, controllers.WhoAmI)
+	//r.POST("/verify", controllers.VerifyToken) // middleware does the same
 	r.Run(":8000")
 }

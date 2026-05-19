@@ -10,34 +10,6 @@ import (
 	"github.com/neozmmv/go-auth/utils"
 )
 
-func CreateUser(c *gin.Context) {
-	errors := []string{}
-	var newUser models.User
-	if err := c.BindJSON(&newUser); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-	if newUser.Name == "" {
-		errors = append(errors, "Name is required")
-	}
-	if newUser.Email == "" {
-		errors = append(errors, "Email is required")
-	}
-	if newUser.Password == "" {
-		errors = append(errors, "Password is required")
-	}
-	if len(errors) > 0 {
-		c.JSON(400, gin.H{"errors": errors})
-		return
-	}
-	err := services.CreateUser(&newUser)
-	if err != nil {
-		c.JSON(500, gin.H{"error": "Failed to create user"})
-		return
-	}
-	c.JSON(201, newUser)
-}
-
 func Login(c *gin.Context) {
 	errors := []string{}
 	var user models.User
@@ -98,7 +70,7 @@ func SignUp(c *gin.Context) {
 	}
 	err := services.CreateUser(&newUser)
 	if err != nil {
-		c.JSON(500, gin.H{"error": "Failed to create user"})
+		c.JSON(409, gin.H{"error": "User already exists with this email"})
 		return
 	}
 	c.JSON(201, newUser)
