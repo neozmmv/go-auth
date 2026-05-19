@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func GenerateToken(name string, email string) (string, error) {
@@ -27,4 +28,20 @@ func ValidateToken(token string) (*jwt.Token, error) {
 		}
 		return jwtSecret, nil
 	})
+}
+
+func HashPassword(password string) (string, error) {
+	hashedBytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", fmt.Errorf("Error hashing password: %w", err)
+	}
+	return string(hashedBytes), nil
+}
+
+func ComparePassword(hash string, password string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	if err != nil {
+		return false
+	}
+	return true
 }

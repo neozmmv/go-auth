@@ -12,6 +12,7 @@ Create a `.env` file on project root with these vars:
 
 ```
 JWT_SECRET=your_jwt_secret
+POSTGRES_HOST=your_host
 POSTGRES_USER=your_db_user
 POSTGRES_PASSWORD=your_password
 POSTGRES_DB=your_db

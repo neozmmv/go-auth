@@ -9,11 +9,6 @@ import (
 	"github.com/neozmmv/go-auth/utils"
 )
 
-// since is just for demo, there is no database nor password hashing.
-var Users = []models.User{
-	{Name: "Neoz", Email: "neoz@mail.com", Password: "password123"},
-}
-
 func GetUsers(c *gin.Context) {
 	c.JSON(200, Users)
 }
