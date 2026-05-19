@@ -15,6 +15,8 @@ func Auth(c *gin.Context) {
 	_, err := utils.ValidateToken(token)
 	if err != nil {
 		c.AbortWithStatusJSON(401, gin.H{"message": "Unauthorized"})
+		return
 	}
+	c.Set("token", token)
 	c.Next()
 }

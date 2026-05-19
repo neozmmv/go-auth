@@ -98,11 +98,7 @@ func VerifyToken(c *gin.Context) {
 }
 
 func WhoAmI(c *gin.Context) {
-	tokenString := strings.TrimPrefix(c.GetHeader("Authorization"), "Bearer ")
-	if tokenString == "" {
-		c.JSON(400, gin.H{"error": "Authorization header is required"})
-		return
-	}
+	tokenString := c.GetString("token")
 	token, err := utils.ValidateToken(tokenString)
 	if err != nil {
 		c.JSON(401, gin.H{"error": "Invalid token"})
